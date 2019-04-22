@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.apache.hadoop:hadoop-hdfs-client:3.1.2">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.hadoop/hadoop-hdfs-client/3.1.2/b5382e1487820af9b12ff1d60b9484cf35e4bbff/hadoop-hdfs-client-3.1.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.hadoop/hadoop-hdfs-client/3.1.2/3644e6d58e706744a87484cbdd7fb49591e6405f/hadoop-hdfs-client-3.1.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
