@@ -1,0 +1,4 @@
+MY_PATH=$(pwd)
+export HADOOP_CONF_DIR=$MY_PATH/conf
+./conf/stop-dfs.sh
+./conf/stop-yarn.sh
