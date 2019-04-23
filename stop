@@ -1,0 +1,6 @@
+MY_PATH=$(pwd)/conf
+SCRIPT="cd $MY_PATH; export HADOOP_CONF_DIR=$MY_PATH; ./stop-dfs.sh; ./stop-yarn.sh; cd .."
+
+COMMAND="ssh -t honolulu '$SCRIPT'"
+
+eval $COMMAND
