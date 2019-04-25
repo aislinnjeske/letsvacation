@@ -26,18 +26,22 @@ def main(args: Array[String]){
     
     //filter out columns where the city is not a word
     val noNumberData = selectedData.filter(selectedData("City") rlike "^[a-zA-Z ]+$")
+    val numberedPrice = noNumberData.filter(noNumberData("Price") rlike "^[0-9]+$")
     
     //Convert the dataframe to an rdd
-    val rows : RDD[Row] = noNumberData.rdd
+    val rows : RDD[Row] = numberedPrice.rdd
     
     //Create key value pairs with key being City, Country, Room Type
-    val keyValuePairs = rows.map(s => (s.get(0) + "," + s.get(1) + "," + s.get(2), Double.parseDouble(s.get(3).toString)))
+    //val keyValuePairs = rows.map(s => (s.get(0).toString.toUpperCase + "," + s.get(1) + "," + s.get(2), Double.parseDouble(s.get(3).toString)))
+    val keyValuePairs = rows.map(s => (s.get(1).toString.toUpperCase + "," + s.get(2), Double.parseDouble(s.get(3).toString)))
     
     //Calculate average values for each key
     val means = keyValuePairs.groupByKey.mapValues(x => x.sum/x.size)
     
     //Write the means to text file
-    means.saveAsTextFile("hdfs://carson-city:8624/termProject/airbnbData/output1")
+    //means.saveAsTextFile("hdfs://carson-city:8624/termProject/airbnbData/output2")
+    
+    means.take(10000).foreach(println)
     }
 
 }

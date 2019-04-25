@@ -1,0 +1,7 @@
+1. Add export PATH=$PATH:/usr/local/sbt/bin to your .bashrc
+2. If reading from hdfs, start you hdfs cluster
+3. build project by running sbt package in the lets-vacation directory
+4. start your spark cluster by ssh onto honolulu and running $SPARK_HOME/sbin/start-all.sh
+5. submit your job by running $SPARK_HOME/bin/spark-submit --master spark://honolulu.cs.colostate.edu:3005 --deploy-mode cluster --class readAirbnbData --supervise target/scala-2.11/lets-vacation_2.11-1.0.jar 
+a. fill in the correct class and jar file 
+6. check progress at honolulu:3006
