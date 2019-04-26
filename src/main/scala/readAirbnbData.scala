@@ -5,6 +5,7 @@ import org.apache.spark.sql.SQLContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.Row
 import java.lang.Double
+import org.apache.spark.sql.functions.input_file_name
 
 object readAirbnbData {
 
@@ -18,30 +19,32 @@ def main(args: Array[String]){
     import sqlContext.implicits._
     
     //Read in the data from HDFS csv file parsing on ;
-    val inputData = sqlContext.read.format("csv").option("header", "true").option("delimiter", ";").load("hdfs://carson-city:8624/termProject/airbnbData/airbnb-listings.csv")
+    val inputData = sqlContext.read.format("csv").option("header", "true").option("delimiter", ";").load("hdfs://carson-city:8624/termProject/cityData/*.csv")
+    
+    //Append the file name to the dataframe to group the housing details
+    val inputDataWithFileName = inputData.withColumn("filename", input_file_name())
     
     //Select only the columns we need and drop any columns with null 
-    //val selectedData = inputData.select("City", "Country", "Room Type", "Price", "Security Deposit", "Cleaning Fee", "Accomodates").na.drop()
-    val selectedData = inputData.select("City", "Country", "Room Type", "Price").na.drop()
-    
-    //filter out columns where the city is not a word
-    val noNumberData = selectedData.filter(selectedData("City") rlike "^[a-zA-Z ]+$")
-    val numberedPrice = noNumberData.filter(noNumberData("Price") rlike "^[0-9]+$")
+    val selectedDataPrice = inputDataWithFileName.select("filename", "country", "room_type", "price").na.drop()
+
+    //filter out columns where the country is not a word and where the price is in $x.xx format
+    val noNumberDataPrice = selectedDataPrice.filter(selectedDataPrice("country") rlike "^[a-zA-Z ]{2,}$")
+    val numberedPrice = noNumberDataPrice.filter(noNumberDataPrice("price") rlike "^\\$[0-9]+\\.[0-9]+$")
     
     //Convert the dataframe to an rdd
-    val rows : RDD[Row] = numberedPrice.rdd
+    val rowsPrice : RDD[Row] = numberedPrice.rdd
     
-    //Create key value pairs with key being City, Country, Room Type
-    //val keyValuePairs = rows.map(s => (s.get(0).toString.toUpperCase + "," + s.get(1) + "," + s.get(2), Double.parseDouble(s.get(3).toString)))
-    val keyValuePairs = rows.map(s => (s.get(1).toString.toUpperCase + "," + s.get(2), Double.parseDouble(s.get(3).toString)))
+    //Create key value pairs with key being City, Country, Room-Type and value is the housing price
+    val keyValuePairsPrice = rowsPrice.map(s => ( s.get(0).toString.substring(s.get(0).toString.lastIndexOf('/') + 1, s.get(0).toString.indexOf('.')) + "," + s.get(1) + "," + s.get(2), Double.parseDouble(s.get(3).toString.substring(1).replace(",",""))))
     
     //Calculate average values for each key
-    val means = keyValuePairs.groupByKey.mapValues(x => x.sum/x.size)
-    
+    val meansPrice = keyValuePairsPrice.groupByKey.mapValues(x => x.sum/x.size)
+
     //Write the means to text file
-    //means.saveAsTextFile("hdfs://carson-city:8624/termProject/airbnbData/output2")
+    //means.saveAsTextFile("hdfs://carson-city:8624/termProject/airbnbData/output3")
     
-    means.take(10000).foreach(println)
+    //Write the means to stdout in spark
+    meansPrice.take(10000).foreach(println)
     }
 
 }
