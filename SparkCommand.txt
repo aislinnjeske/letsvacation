@@ -1,0 +1,1 @@
+$SPARK_HOME/bin/spark-submit --master spark://honolulu:3005 --deploy-mode cluster --class --class ExampleAnalysis --supervise target/scala-2.11/let-s-vacation_2.11-1.0.jar
