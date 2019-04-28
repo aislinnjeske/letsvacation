@@ -5,7 +5,7 @@ import org.apache.spark.sql.SQLContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.Row
 import java.lang.Double
-import org.apache.spark.sql.functions.input_file_name
+import org.apache.spark.sql.functions._
 
 object readAirbnbData {
 
@@ -26,16 +26,18 @@ def main(args: Array[String]){
     
     //Select only the columns we need and drop any columns with null 
     val selectedDataPrice = inputDataWithFileName.select("filename", "country", "room_type", "price").na.drop()
+    
+    val newRoomTypes = selectedDataPrice.withColumn("room_type", when(selectedDataPrice("room_type") === "Entire home/apt", "hi"). when(selectedDataPrice("room_type") === "Shared room", "lo").when(selectedDataPrice("room_type") === "Private room", "mid").otherwise(selectedDataPrice("room_type")))
 
     //filter out columns where the country is not a word and where the price is in $x.xx format
-    val noNumberDataPrice = selectedDataPrice.filter(selectedDataPrice("country") rlike "^[a-zA-Z ]{2,}$")
+    val noNumberDataPrice = newRoomTypes.filter(newRoomTypes("country") rlike "^[a-zA-Z ]{2,}$")
     val numberedPrice = noNumberDataPrice.filter(noNumberDataPrice("price") rlike "^\\$[0-9]+\\.[0-9]+$")
     
     //Convert the dataframe to an rdd
     val rowsPrice : RDD[Row] = numberedPrice.rdd
     
     //Create key value pairs with key being City, Country, Room-Type and value is the housing price
-    val keyValuePairsPrice = rowsPrice.map(s => ( s.get(0).toString.substring(s.get(0).toString.lastIndexOf('/') + 1, s.get(0).toString.indexOf('.')).capitalize.replace("-", " ") + "," + s.get(1) + "," + s.get(2), Double.parseDouble(s.get(3).toString.substring(1).replace(",",""))))
+    val keyValuePairsPrice = rowsPrice.map(s => ( s.get(0).toString.substring(s.get(0).toString.lastIndexOf('/') + 1, s.get(0).toString.indexOf('.')).capitalize.replace("-", " ") + "," + s.get(2), Double.parseDouble(s.get(3).toString.substring(1).replace(",",""))))
     
     //Calculate average values for each key
     val meansPrice = keyValuePairsPrice.groupByKey.mapValues(x => x.sum/x.size)
