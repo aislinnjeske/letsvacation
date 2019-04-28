@@ -5,7 +5,7 @@ import org.apache.spark.sql.SQLContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.Row
 import java.lang.Double
-import org.apache.spark.sql.functions.input_file_name
+import org.apache.spark.sql.functions._
 
 object readAirbnbDataDeposits {
 
@@ -26,9 +26,11 @@ def main(args: Array[String]){
     
     //Select only the columns we need and drop any columns with null 
     val selectedData = inputDataWithFileName.select("filename", "country", "room_type", "security_deposit", "cleaning_fee").na.fill(Map("security_deposit" -> "$0.00", "cleaning_fee" -> "$0.00")).na.drop()
+    
+    val newRoomTypes = selectedData.withColumn("room_type", when(selectedData("room_type") === "Entire home/apt", "hi"). when(selectedData("room_type") === "Shared room", "lo").when(selectedData("room_type") === "Private room", "mid").otherwise(selectedData("room_type")))
 
     //filter out columns where the country is not a word and where the price is in $x.xx format
-    val noNumberData = selectedData.filter(selectedData("country") rlike "^[a-zA-Z ]{3,}$")
+    val noNumberData = newRoomTypes.filter(newRoomTypes("country") rlike "^[a-zA-Z ]{3,}$")
     val noNumberData2 = noNumberData.filter(noNumberData("room_type") rlike "^[a-zA-Z/ ]{2,}$")
     val numbered = noNumberData2.filter(noNumberData2("security_deposit") rlike "^\\$[0-9]+\\.[0-9]+$")
     
@@ -36,7 +38,7 @@ def main(args: Array[String]){
     val rows : RDD[Row] = numbered.rdd
     
     //Create key value pairs with key being City, Country, Room-Type and value is the housing price
-    val keyValuePairs = rows.map(s => ( s.get(0).toString.substring(s.get(0).toString.lastIndexOf('/') + 1, s.get(0).toString.indexOf('.')).capitalize.replace("-", " ") + "," + s.get(1) + "," + s.get(2), Double.parseDouble(s.get(3).toString.substring(1).replace(",","")) + Double.parseDouble(s.get(4).toString.substring(1).replace(",",""))))
+    val keyValuePairs = rows.map(s => ( s.get(0).toString.substring(s.get(0).toString.lastIndexOf('/') + 1, s.get(0).toString.indexOf('.')).capitalize.replace("-", " ") + "," + s.get(2), Double.parseDouble(s.get(3).toString.substring(1).replace(",","")) + Double.parseDouble(s.get(4).toString.substring(1).replace(",",""))))
     
     //Calculate average values for each key
     val means = keyValuePairs.groupByKey.mapValues(x => x.sum/x.size)
