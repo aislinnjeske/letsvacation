@@ -25,7 +25,7 @@ def main(args: Array[String]){
     val inputDataWithFileName = inputData.withColumn("filename", input_file_name())
     
     //Select only the columns we need and drop any columns with null 
-    val selectedData = inputDataWithFileName.select("filename", "country", "room_type", "security_deposit", "cleaning_fee").na.drop()
+    val selectedData = inputDataWithFileName.select("filename", "country", "room_type", "security_deposit", "cleaning_fee").na.fill(Map("security_deposit" -> "$0.00", "cleaning_fee" -> "$0.00")).na.drop()
 
     //filter out columns where the country is not a word and where the price is in $x.xx format
     val noNumberData = selectedData.filter(selectedData("country") rlike "^[a-zA-Z ]{3,}$")
@@ -36,7 +36,7 @@ def main(args: Array[String]){
     val rows : RDD[Row] = numbered.rdd
     
     //Create key value pairs with key being City, Country, Room-Type and value is the housing price
-    val keyValuePairs = rows.map(s => ( s.get(0).toString.substring(s.get(0).toString.lastIndexOf('/') + 1, s.get(0).toString.indexOf('.')) + "," + s.get(1) + "," + s.get(2), Double.parseDouble(s.get(3).toString.substring(1).replace(",","")) + Double.parseDouble(s.get(4).toString.substring(1).replace(",",""))))
+    val keyValuePairs = rows.map(s => ( s.get(0).toString.substring(s.get(0).toString.lastIndexOf('/') + 1, s.get(0).toString.indexOf('.')).capitalize.replace("-", " ") + "," + s.get(1) + "," + s.get(2), Double.parseDouble(s.get(3).toString.substring(1).replace(",","")) + Double.parseDouble(s.get(4).toString.substring(1).replace(",",""))))
     
     //Calculate average values for each key
     val means = keyValuePairs.groupByKey.mapValues(x => x.sum/x.size)

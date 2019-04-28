@@ -35,7 +35,7 @@ def main(args: Array[String]){
     val rowsPrice : RDD[Row] = numberedPrice.rdd
     
     //Create key value pairs with key being City, Country, Room-Type and value is the housing price
-    val keyValuePairsPrice = rowsPrice.map(s => ( s.get(0).toString.substring(s.get(0).toString.lastIndexOf('/') + 1, s.get(0).toString.indexOf('.')) + "," + s.get(1) + "," + s.get(2), Double.parseDouble(s.get(3).toString.substring(1).replace(",",""))))
+    val keyValuePairsPrice = rowsPrice.map(s => ( s.get(0).toString.substring(s.get(0).toString.lastIndexOf('/') + 1, s.get(0).toString.indexOf('.')).capitalize.replace("-", " ") + "," + s.get(1) + "," + s.get(2), Double.parseDouble(s.get(3).toString.substring(1).replace(",",""))))
     
     //Calculate average values for each key
     val meansPrice = keyValuePairsPrice.groupByKey.mapValues(x => x.sum/x.size)
