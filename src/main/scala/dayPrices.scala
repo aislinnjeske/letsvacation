@@ -53,7 +53,7 @@ object dayPrices {
         // Index 11 = Taxi 1km
         // Index 12 = Apple
         // Index 13 = Lettuce head
-
+      /*
         val dayPrices = pricesPerItem.map(s => (
             s(0).toString,
             s(3).toDouble + s(13).toDouble/3 + s(7).toDouble + s(9).toDouble/7 + s(12).toDouble + s(3).toDouble + s(4).toDouble,
@@ -63,9 +63,36 @@ object dayPrices {
             s(10).toDouble + s(11).toDouble * 10,
             s(10).toDouble + s(11).toDouble * 20
         ))
-        
-        //dayPrices.collect
-        dayPrices.take(10000).foreach(println)
+      */
+      val lowPrices = pricesPerItem.map(s => (
+            s(0).toString,
+	        "lo",
+            s(3).toDouble + s(13).toDouble/3 + s(7).toDouble + s(9).toDouble/7 + s(12).toDouble + s(3).toDouble + s(4).toDouble,
+            s(8).toDouble*2
+        ))
 
+
+      val midPrices = pricesPerItem.map(s => (
+            s(0).toString,
+	        "mid",
+	        s(3).toDouble + s(1).toDouble + s(1).toDouble + s(4).toDouble,
+	        s(10).toDouble + s(11).toDouble * 10
+        ))
+
+
+      val highPrices = pricesPerItem.map(s => (
+            s(0).toString,
+	        "hi",
+            s(1).toDouble + s(1).toDouble + s(2).toDouble/2,
+            s(10).toDouble + s(11).toDouble * 20
+        ))
+
+
+
+        //dayPrices.collect
+
+        lowPrices.take(10000).foreach(println)
+        midPrices.take(10000).foreach(println)
+        highPrices.take(10000).foreach(println)
 	}
 }
