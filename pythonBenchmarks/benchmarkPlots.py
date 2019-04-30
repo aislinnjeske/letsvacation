@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import random
 
-def readfile(filename, random=False):
+def readfile(filename, randomSelection=False):
     with open(filename) as f:
         lines = f.readlines()
         lines = [line[1:-2].split(",") for line in lines]
@@ -23,7 +23,7 @@ def readfile(filename, random=False):
         hi = [entry[1] for entry in hi if entry[0] in midLabels and entry[0] in loLabels]
         labels = [label for label in loLabels if label in midLabels and label in hiLabels]
         
-        if random:
+        if randomSelection:
             randomValues = random.sample(range(1, len(labels)), 20)
             return rList(lo, randomValues), rList(mid, randomValues), rList(hi, randomValues), rList(labels, randomValues)
         else:
@@ -33,29 +33,6 @@ def rList(l, randomValues):
     return [l[x] for x in randomValues]
     
 def plot(lo, mid, hi, labels):
-    #half = len(labels) // 2
-    #plt.subplot(2,1,1)
-    #plt.plot(lo[:half], '-o', label="Low Budget")
-    #plt.plot(mid[:half], '-o', label="Mid Budget")
-    #plt.plot(hi[:half], '-o', label="High Budget")
-    #plt.xticks(range(half), labels[:half], rotation=60, horizontalalignment='right')
-    #plt.tick_params(axis='x', which='major', labelsize=10)
-    #plt.ylabel("Number of Days")
-    #plt.grid()
-    #plt.legend()
-    
-    #plt.subplot(2,1,2)
-    #plt.plot(lo[half:], '-o', label="Low Budget")
-    #plt.plot(mid[half:], '-o', label="Mid Budget")
-    #plt.plot(hi[half:], '-o', label="High Budget")
-    #plt.xticks(range(half), labels[half:], rotation=60, horizontalalignment='right')
-    #plt.tick_params(axis='x', which='major', labelsize=10)
-    #plt.xlabel("City Name")
-    #plt.ylabel("Number of Days")
-    ##plt.suptitle("With a Budget of $2000, How Long Can I Stay in Each City?")
-    #plt.grid()
-    #plt.legend()
-    #plt.show()
     plt.plot(lo, '-o', label="Low Budget")
     plt.plot(mid, '-o', label="Mid Budget")
     plt.plot(hi, '-o', label="High Budget")
@@ -69,30 +46,12 @@ def plot(lo, mid, hi, labels):
     plt.tight_layout()
     plt.show()
     
-def calculateMostAndLeast(lo, mid, hi, labels):
-    totals = [[lo[x] + mid[x] +  hi[x], lo[x], mid[x], hi[x], labels[x]] for x in range(len(labels))]
-    totals.sort()
-    top = totals[:10]
-    bottom = totals[-10:]
-    
-    
-    
-if __name__ =="__main__":
-    
-    #random set of 20 for budget of 5000
-    #lo, mid, hi, labels = readfile("../tripsForUser5KBudget.txt", True)
-    #plot(lo, mid, hi, labels)
-    
-    #Calculate 10 most and 10 least cities fo 5000
-    _, mid5, _, labels5 = readfile("../tripsForUser5KBudget.txt")
-    _, mid2, _, _ = readfile("../tripsForUser2KBudget.txt")
-    _, mid1, _, _ = readfile("../tripsForUser900Budget.txt")
-    print(mid2)
+def compareBudgets():
+    _, mid5, _, labels5 = readfile("../data/tripsForUser5KBudget.txt")
+    _, mid2, _, _ = readfile("../data/tripsForUser2KBudget.txt")
+    _, mid1, _, _ = readfile("../data/tripsForUser900Budget.txt")
     rV = random.sample(range(1, len(labels5)), 20)
-    mid5, mid2, mid1 = rList(mid5, rV), rList(mid2, rV), rList(mid1, rV)
-    print(mid2)
-    labels5 = rList(labels5, rV)
-    
+    mid5, mid2, mid1, labels5 = rList(mid5, rV), rList(mid2, rV), rList(mid1, rV), rList(labels5, rV)
     plt.plot(mid5, '-o', label="Mid 5K Budget")
     plt.plot(mid2, '-o', label="Mid 2K Budget")
     plt.plot(mid1, '-o', label="Mid 900 Budget")
@@ -106,9 +65,13 @@ if __name__ =="__main__":
     plt.tight_layout()
     plt.show()
     
+if __name__ =="__main__":
+    #random set of 20 for budget of 5000
+    lo, mid, hi, labels = readfile("../data/tripsForUser5KBudget.txt", True)
+    plot(lo, mid, hi, labels)
     
+    #Compare random cities at diff budget levels
+    compareBudgets()
     
-    #calculateMostAndLeast(lo, mid, hi, labels)
+
     
-    #print(output)
-    #plot(lo, mid, hi, labels)
