@@ -1,6 +1,6 @@
 # Let's Vacation
 
-Are you indecesive traveler? Want to use your PTO but don't know where to go? It's common knowledge that vacationing in some
+Are you an indecisive traveler? Want to use your PTO but don't know where to go? It's common knowledge that vacationing in some
 places around the world is more expensive than others. So do you spend 3 days in Zurich? Or a week in Lima?
 
 
